@@ -1,7 +1,7 @@
 
 # Git Commenter
 
-**GitHub Action: 자동으로 커밋 및 Pull Request 리뷰 코멘트를 생성합니다.**  
+**LLM을 연동하여 자동으로 커밋 및 Pull Request 리뷰 코멘트를 생성합니다.**  
 OpenAI, Azure OpenAI, Google Gemini 와 연동할 수 있으며, 커스텀 프롬프트를 지원합니다.
 
 ---
