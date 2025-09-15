@@ -5,7 +5,12 @@ export interface FileDiffChunk {
   chunk: string;
 }
 
-export async function getDiffChunks(token: string, maxLines = 200): Promise<FileDiffChunk[]> {
+export async function getDiffChunks(
+  token: string,
+  maxLines = 200,
+  excludePaths: string[] = [],
+  excludeExts: string[] = []
+): Promise<FileDiffChunk[]> {
   const octokit = github.getOctokit(token);
   const { context } = github;
 
@@ -49,9 +54,12 @@ export async function getDiffChunks(token: string, maxLines = 200): Promise<File
 
   for (const part of parts) {
     const lines = part.split("\n");
-    const header = lines[0]; 
+    const header = lines[0];
     const match = header.match(/a\/(\S+)\s+b\/(\S+)/);
     const filename = match ? match[2] : "unknown";
+
+    if (excludePaths.some((p) => filename.startsWith(p))) continue;
+    if (excludeExts.some((ext) => filename.endsWith(ext))) continue;
 
     for (let i = 0; i < lines.length; i += maxLines) {
       const chunk = lines.slice(i, i + maxLines).join("\n");

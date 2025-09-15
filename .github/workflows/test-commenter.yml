@@ -30,6 +30,8 @@ jobs:
             - 잠재적 리스크 식별
             - 개선사항 제안
           token: ${{ secrets.TOKEN }}
+          exclude_paths: "dist/"
+          exclude_exts: ".md,.txt"
 
       # --- OpenAI 예시 ---
       # - name: Run Git Commenter (OpenAI)
@@ -45,7 +47,9 @@ jobs:
       #       - 변경 이유 설명
       #       - 잠재적 리스크 식별
       #       - 개선사항 제안
-      #     github_token: ${{ secrets.TOKEN }}
+      #     token: ${{ secrets.TOKEN }}
+      #     exclude_paths: "docs/,tests/"
+      #     exclude_exts: ".md,.txt"
 
       # --- Gemini 예시 ---
       # - name: Run Git Commenter (Google Gemini)
@@ -61,4 +65,6 @@ jobs:
       #       - 변경 이유 설명
       #       - 잠재적 리스크 식별
       #       - 개선사항 제안
-      #     github_token: ${{ secrets.TOKEN }}
+      #     token: ${{ secrets.TOKEN }}
+      #     exclude_paths: "docs/,tests/"
+      #     exclude_exts: ".md,.txt"

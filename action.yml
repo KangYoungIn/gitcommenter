@@ -2,6 +2,13 @@ name: "Git Commenter"
 description: "Generate commit and PR review comments using LLMs"
 
 inputs:
+  exclude_paths:
+    description: "Comma-separated list of paths to exclude from diff (e.g. 'docs/,tests/')"
+    required: false
+  exclude_exts:
+    description: "Comma-separated list of file extensions to exclude (e.g. '.md,.txt')"
+    required: false
+
   provider:
     description: "LLM provider (openai | azure | gemini)"
     required: true

@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDiffChunks = getDiffChunks;
 const github = __importStar(require("@actions/github"));
-async function getDiffChunks(token, maxLines = 200) {
+async function getDiffChunks(token, maxLines = 200, excludePaths = [], excludeExts = []) {
     const octokit = github.getOctokit(token);
     const { context } = github;
     let diffText = "";
@@ -74,6 +74,10 @@ async function getDiffChunks(token, maxLines = 200) {
         const header = lines[0];
         const match = header.match(/a\/(\S+)\s+b\/(\S+)/);
         const filename = match ? match[2] : "unknown";
+        if (excludePaths.some((p) => filename.startsWith(p)))
+            continue;
+        if (excludeExts.some((ext) => filename.endsWith(ext)))
+            continue;
         for (let i = 0; i < lines.length; i += maxLines) {
             const chunk = lines.slice(i, i + maxLines).join("\n");
             files.push({ filename, chunk });

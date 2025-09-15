@@ -14,7 +14,20 @@ async function run() {
     const template = core.getInput("prompt_template");
     const token = core.getInput("token");
 
-    const chunks: FileDiffChunk[] = await getDiffChunks(token);
+    const excludePaths = core.getInput("exclude_paths")
+      ? core.getInput("exclude_paths").split(",").map((s) => s.trim())
+      : [];
+
+    const excludeExts = core.getInput("exclude_exts")
+      ? core.getInput("exclude_exts").split(",").map((s) => s.trim())
+      : [];
+
+    const chunks: FileDiffChunk[] = await getDiffChunks(token, 200, excludePaths, excludeExts);
+
+    if (chunks.length === 0) {
+      core.info("No diff chunks found (possibly filtered out). Skipping.");
+      return;
+    }
 
     let llm;
     switch (provider) {
@@ -45,18 +58,25 @@ async function run() {
       };
 
       const prompt = buildPrompt(template, context);
+
+      core.info(`Generating review for ${filename}...`);
       const partial = await llm.generate(prompt, model);
-      aggregatedResponse += `\n[${filename}] ${partial}`;
+
+      aggregatedResponse += `\n[${filename}]\n${partial}\n`;
     }
 
     if (github.context.eventName === "push") {
       const commitSha = github.context.sha;
+      core.info(`Posting commit comment on ${commitSha}`);
       await postCommitComment(token, commitSha, aggregatedResponse);
     } else if (github.context.eventName === "pull_request") {
       const pr = github.context.payload.pull_request;
       if (pr) {
+        core.info(`Posting PR review on #${pr.number}`);
         await postPRReview(token, pr.number, aggregatedResponse);
       }
+    } else {
+      core.info("No supported event type. Only push and pull_request are handled.");
     }
   } catch (error: any) {
     core.setFailed(error.message);
