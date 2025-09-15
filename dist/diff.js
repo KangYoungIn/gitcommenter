@@ -32,48 +32,41 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDiff = getDiff;
 const github = __importStar(require("@actions/github"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
-async function getDiff() {
+async function getDiff(token) {
+    const octokit = github.getOctokit(token);
     const { context } = github;
     if (context.eventName === "push") {
-        const repo = context.payload.repository;
-        if (!repo) {
-            throw new Error("Push event payload missing repository info");
-        }
         const before = context.payload.before;
         const after = context.payload.after;
         if (!before || !after) {
             throw new Error("Push event payload missing before/after commits");
         }
-        const url = repo.compare_url
-            .replace("{base}", before)
-            .replace("{head}", after);
-        const res = await (0, node_fetch_1.default)(url);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch diff: ${res.status} ${res.statusText}`);
-        }
-        return await res.text();
+        const res = await octokit.rest.repos.compareCommits({
+            ...context.repo,
+            base: before,
+            head: after,
+            headers: {
+                accept: "application/vnd.github.v3.diff",
+            },
+        });
+        return res.data;
     }
     if (context.eventName === "pull_request") {
         const pr = context.payload.pull_request;
         if (!pr) {
             throw new Error("Pull request event payload missing PR info");
         }
-        const diffUrl = pr.diff_url;
-        if (!diffUrl) {
-            throw new Error("Pull request event payload missing diff_url");
-        }
-        const res = await (0, node_fetch_1.default)(diffUrl);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch diff: ${res.status} ${res.statusText}`);
-        }
-        return await res.text();
+        const res = await octokit.rest.pulls.get({
+            ...context.repo,
+            pull_number: pr.number,
+            headers: {
+                accept: "application/vnd.github.v3.diff",
+            },
+        });
+        return res.data;
     }
     return "";
 }
