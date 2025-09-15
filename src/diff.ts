@@ -1,15 +1,10 @@
 import * as github from "@actions/github";
-import fetch from "node-fetch";
 
-export async function getDiff(): Promise<string> {
+export async function getDiff(token: string): Promise<string> {
+  const octokit = github.getOctokit(token);
   const { context } = github;
 
   if (context.eventName === "push") {
-    const repo = context.payload.repository;
-    if (!repo) {
-      throw new Error("Push event payload missing repository info");
-    }
-
     const before = context.payload.before;
     const after = context.payload.after;
 
@@ -17,15 +12,16 @@ export async function getDiff(): Promise<string> {
       throw new Error("Push event payload missing before/after commits");
     }
 
-    const url = repo.compare_url
-      .replace("{base}", before)
-      .replace("{head}", after);
+    const res = await octokit.rest.repos.compareCommits({
+      ...context.repo,
+      base: before,
+      head: after,
+      headers: {
+        accept: "application/vnd.github.v3.diff", 
+      },
+    });
 
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch diff: ${res.status} ${res.statusText}`);
-    }
-    return await res.text();
+    return res.data as unknown as string;
   }
 
   if (context.eventName === "pull_request") {
@@ -34,16 +30,15 @@ export async function getDiff(): Promise<string> {
       throw new Error("Pull request event payload missing PR info");
     }
 
-    const diffUrl = pr.diff_url;
-    if (!diffUrl) {
-      throw new Error("Pull request event payload missing diff_url");
-    }
+    const res = await octokit.rest.pulls.get({
+      ...context.repo,
+      pull_number: pr.number,
+      headers: {
+        accept: "application/vnd.github.v3.diff",
+      },
+    });
 
-    const res = await fetch(diffUrl);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch diff: ${res.status} ${res.statusText}`);
-    }
-    return await res.text();
+    return res.data as unknown as string;
   }
 
   return "";

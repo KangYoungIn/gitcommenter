@@ -14,7 +14,7 @@ async function run() {
     const template = core.getInput("prompt_template");
     const token = core.getInput("token");
 
-    const diff = await getDiff();
+    const diff = await getDiff(token);
     const context = {
       diff,
       files: [],
