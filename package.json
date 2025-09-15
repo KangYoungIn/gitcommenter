@@ -1,14 +1,25 @@
 {
   "name": "tool-gitcommenter",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "GitHub Action: Generate commit and PR review comments using LLMs (OpenAI, Azure OpenAI, Gemini)",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "package": "ncc build src/index.ts -o dist",
+    "lint": "tsc --noEmit",
+    "test": "echo \"No tests configured\""
   },
-  "keywords": [],
+  "keywords": [
+    "github-actions",
+    "llm",
+    "openai",
+    "azure-openai",
+    "gemini",
+    "code-review",
+    "commit-comment"
+  ],
   "author": "",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
@@ -17,8 +28,8 @@
     "openai": "^5.20.2"
   },
   "devDependencies": {
-    "@types/node": "^24.4.0",
+    "@types/node": "^20.12.7",
     "@vercel/ncc": "^0.38.3",
-    "typescript": "^5.9.2"
+    "typescript": "^5.4.0"
   }
 }
