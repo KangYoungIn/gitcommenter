@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Git Commenter
-        uses: KangYoungIn/gitcommenter@v1
+        uses: KangYoungIn/git-commenter@v1.0.0
         with:
           provider: azure
           model: gpt-4o
@@ -78,7 +78,7 @@ jobs:
 ### OpenAI 
 
 ```yaml
-- uses: KangYoungIn/gitcommenter@v1
+- uses: KangYoungIn/git-commenter@v1.0.0
   with:
     provider: openai
     model: gpt-4o-mini
@@ -91,7 +91,7 @@ jobs:
 ### Gemini 
 
 ```yaml
-- uses: KangYoungIn/gitcommenter@v1
+- uses: KangYoungIn/git-commenter@v1.0.0
   with:
     provider: gemini
     model: gemini-pro
