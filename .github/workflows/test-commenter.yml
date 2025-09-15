@@ -1,0 +1,64 @@
+name: Test Git Commenter
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Git Commenter (Azure OpenAI)
+        uses: ./   
+        with:
+          provider: azure
+          model: gpt-4o
+          azure_endpoint: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          azure_api_key: ${{ secrets.AZURE_OPENAI_KEY }}
+          azure_deployment: gpt-4o    
+          azure_api_version: 2024-04-01-preview
+          prompt_template: |
+            변경된 코드(diff):
+            {{diff}}
+
+            분석 지침:
+            - 변경 이유 설명
+            - 잠재적 리스크 식별
+            - 개선사항 제안
+          github_token: ${{ secrets.TOKEN }}
+
+      # --- OpenAI 예시 ---
+      # - name: Run Git Commenter (OpenAI)
+      #   uses: ./
+      #   with:
+      #     provider: openai
+      #     model: gpt-4o-mini
+      #     openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+      #     prompt_template: |
+      #       변경된 코드(diff):
+      #       {{diff}}
+      #       분석 지침:
+      #       - 변경 이유 설명
+      #       - 잠재적 리스크 식별
+      #       - 개선사항 제안
+      #     github_token: ${{ secrets.TOKEN }}
+
+      # --- Gemini 예시 ---
+      # - name: Run Git Commenter (Google Gemini)
+      #   uses: ./
+      #   with:
+      #     provider: gemini
+      #     model: gemini-pro
+      #     gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+      #     prompt_template: |
+      #       변경된 코드(diff):
+      #       {{diff}}
+      #       분석 지침:
+      #       - 변경 이유 설명
+      #       - 잠재적 리스크 식별
+      #       - 개선사항 제안
+      #     github_token: ${{ secrets.TOKEN }}

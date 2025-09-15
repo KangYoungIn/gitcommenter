@@ -1,0 +1,46 @@
+name: "Git Commenter"
+description: "Generate commit and PR review comments using LLMs"
+
+inputs:
+  provider:
+    description: "LLM provider (openai | azure | gemini)"
+    required: true
+
+  # 공통
+  model:
+    description: "Model name or deployment name (depending on provider)"
+    required: true
+  prompt_template:
+    description: "Custom prompt template (supports {{diff}}, {{files}}, {{commit_message}})"
+    required: true
+  token:
+    description: "GitHub Token"
+    required: true
+
+  # OpenAI
+  openai_api_key:
+    description: "OpenAI API Key"
+    required: false
+
+  # Azure OpenAI
+  azure_api_key:
+    description: "Azure OpenAI API Key"
+    required: false
+  azure_endpoint:
+    description: "Azure OpenAI endpoint"
+    required: false
+  azure_deployment:
+    description: "Azure OpenAI deployment name (use instead of model if needed)"
+    required: false
+  azure_api_version:
+    description: "Azure OpenAI API version (default: 2024-04-01-preview)"
+    required: false
+
+  # Google Gemini
+  gemini_api_key:
+    description: "Google Gemini API Key"
+    required: false
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
